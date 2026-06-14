@@ -1,6 +1,7 @@
 // Path: app/src/main/java/com/castrodev/workouttracker/features/auth/presentation/screen/LoginScreen.kt
 package com.castrodev.workouttracker.features.auth.presentation.screen
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,9 +23,13 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state    by viewModel.state.collectAsState()
+    val darkTheme = isSystemInDarkTheme()
     var email    by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val textColor    = if (darkTheme) Color.White else Color.Black
+    val subtitleColor = if (darkTheme) Color.White.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.6f)
 
     LaunchedEffect(state) {
         if (state is AuthState.Success) onLoginSuccess()
@@ -37,7 +42,7 @@ fun LoginScreen(
     ) {
         Text(stringResource(R.string.app_name), fontSize = 32.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.login_subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+        Text(stringResource(R.string.login_subtitle), style = MaterialTheme.typography.bodyMedium, color = subtitleColor)
         Spacer(Modifier.height(40.dp))
 
         OutlinedTextField(
@@ -47,21 +52,21 @@ fun LoginScreen(
             modifier      = Modifier.fillMaxWidth(),
             singleLine    = true,
             colors        = OutlinedTextFieldDefaults.colors(
-                focusedTextColor   = Color.Black,
-                unfocusedTextColor = Color.Black
+                focusedTextColor   = textColor,
+                unfocusedTextColor = textColor
             )
         )
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
-            value                  = password,
-            onValueChange          = { password = it },
-            label                  = { Text(stringResource(R.string.password)) },
-            modifier               = Modifier.fillMaxWidth(),
-            singleLine             = true,
-            visualTransformation   = PasswordVisualTransformation(),
-            colors                 = OutlinedTextFieldDefaults.colors(
-                focusedTextColor   = Color.Black,
-                unfocusedTextColor = Color.Black
+            value                = password,
+            onValueChange        = { password = it },
+            label                = { Text(stringResource(R.string.password)) },
+            modifier             = Modifier.fillMaxWidth(),
+            singleLine           = true,
+            visualTransformation = PasswordVisualTransformation(),
+            colors               = OutlinedTextFieldDefaults.colors(
+                focusedTextColor   = textColor,
+                unfocusedTextColor = textColor
             )
         )
         Spacer(Modifier.height(24.dp))
@@ -88,7 +93,7 @@ fun LoginScreen(
         Spacer(Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.no_account), style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.no_account), style = MaterialTheme.typography.bodyMedium, color = subtitleColor)
             TextButton(onClick = onNavigateToRegister) { Text(stringResource(R.string.register)) }
         }
     }

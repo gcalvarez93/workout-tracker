@@ -1,4 +1,4 @@
-// Path: app/src/main/java/com/castrodev/workouttracker/navigation/AppNavigation.kt
+/// Path: app/src/main/java/com/castrodev/workouttracker/navigation/AppNavigation.kt
 package com.castrodev.workouttracker.navigation
 
 import androidx.compose.runtime.Composable
@@ -44,7 +44,14 @@ fun AppNavigation() {
             )
         }
         composable(Screen.Main.route) {
-            // MainScreen — próximamente
+            MainScreen(
+                onLogout = {
+                    authViewModel.signOut()
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }
