@@ -20,6 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.castrodev.workouttracker.R
+import com.castrodev.workouttracker.features.analytics.presentation.screen.AnalyticsScreen
+import com.castrodev.workouttracker.features.analytics.presentation.viewmodel.AnalyticsViewModel
 import com.castrodev.workouttracker.features.routines.domain.entity.RoutineEntity
 import com.castrodev.workouttracker.features.routines.presentation.screen.RoutineDetailScreen
 import com.castrodev.workouttracker.features.routines.presentation.screen.RoutinesScreen
@@ -39,18 +41,17 @@ sealed class BottomTab(val route: String, val labelRes: Int, val icon: ImageVect
 
 @Composable
 fun MainScreen(onLogout: () -> Unit) {
-    val navController          = rememberNavController()
-    val routineViewModel: RoutineViewModel = viewModel()
-    val sessionViewModel: SessionViewModel = viewModel()
+    val navController              = rememberNavController()
+    val routineViewModel: RoutineViewModel   = viewModel()
+    val sessionViewModel: SessionViewModel   = viewModel()
+    val analyticsViewModel: AnalyticsViewModel = viewModel()
     val tabs = listOf(BottomTab.Routines, BottomTab.Sessions, BottomTab.Analytics, BottomTab.Profile)
     val tabRoutes = tabs.map { it.route }
 
-    // Rutina seleccionada para pasarla a ActiveSessionScreen
     var selectedRoutine by remember { mutableStateOf<RoutineEntity?>(null) }
     val activeState by sessionViewModel.activeState.collectAsState()
-
-    // Navegar a ActiveSession cuando se inicia una sesión
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+
     LaunchedEffect(activeState) {
         if (activeState is ActiveSessionState.Active) {
             val sessionId = (activeState as ActiveSessionState.Active).sessionId
@@ -121,8 +122,12 @@ fun MainScreen(onLogout: () -> Unit) {
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
-            composable(BottomTab.Analytics.route) { /* AnalyticsScreen — próximamente */ }
-            composable(BottomTab.Profile.route)   { /* ProfileScreen — próximamente */ }
+            composable(BottomTab.Analytics.route) {
+                AnalyticsScreen(viewModel = analyticsViewModel)
+            }
+            composable(BottomTab.Profile.route) {
+                // ProfileScreen — próximamente
+            }
         }
     }
 }
