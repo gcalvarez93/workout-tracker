@@ -22,7 +22,10 @@ import androidx.navigation.compose.rememberNavController
 import com.castrodev.workouttracker.R
 import com.castrodev.workouttracker.features.analytics.presentation.screen.AnalyticsScreen
 import com.castrodev.workouttracker.features.analytics.presentation.viewmodel.AnalyticsViewModel
+import com.castrodev.workouttracker.features.auth.presentation.viewmodel.AuthViewModel
 import com.castrodev.workouttracker.features.bodyweight.presentation.viewmodel.BodyweightViewModel
+import com.castrodev.workouttracker.features.profile.presentation.screen.ProfileScreen
+import com.castrodev.workouttracker.features.profile.presentation.viewmodel.ProfileViewModel
 import com.castrodev.workouttracker.features.routines.domain.entity.RoutineEntity
 import com.castrodev.workouttracker.features.routines.presentation.screen.RoutineDetailScreen
 import com.castrodev.workouttracker.features.routines.presentation.screen.RoutinesScreen
@@ -42,16 +45,18 @@ sealed class BottomTab(val route: String, val labelRes: Int, val icon: ImageVect
 
 @Composable
 fun MainScreen(onLogout: () -> Unit) {
-    val navController              = rememberNavController()
-    val routineViewModel: RoutineViewModel   = viewModel()
-    val sessionViewModel: SessionViewModel   = viewModel()
+    val navController                      = rememberNavController()
+    val authViewModel: AuthViewModel       = viewModel()
+    val routineViewModel: RoutineViewModel = viewModel()
+    val sessionViewModel: SessionViewModel = viewModel()
     val analyticsViewModel: AnalyticsViewModel = viewModel()
     val bodyweightViewModel: BodyweightViewModel = viewModel()
+    val profileViewModel: ProfileViewModel = viewModel()
     val tabs = listOf(BottomTab.Routines, BottomTab.Sessions, BottomTab.Analytics, BottomTab.Profile)
     val tabRoutes = tabs.map { it.route }
 
     var selectedRoutine by remember { mutableStateOf<RoutineEntity?>(null) }
-    val activeState by sessionViewModel.activeState.collectAsState()
+    val activeState     by sessionViewModel.activeState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     LaunchedEffect(activeState) {
@@ -131,7 +136,11 @@ fun MainScreen(onLogout: () -> Unit) {
                 )
             }
             composable(BottomTab.Profile.route) {
-                // ProfileScreen — próximamente
+                ProfileScreen(
+                    authViewModel    = authViewModel,
+                    onLogout         = onLogout,
+                    profileViewModel = profileViewModel
+                )
             }
         }
     }
