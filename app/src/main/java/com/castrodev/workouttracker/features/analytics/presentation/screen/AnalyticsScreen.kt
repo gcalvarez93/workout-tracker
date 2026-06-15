@@ -2,10 +2,11 @@
 package com.castrodev.workouttracker.features.analytics.presentation.screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
@@ -19,76 +20,115 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.castrodev.workouttracker.R
 import com.castrodev.workouttracker.features.analytics.presentation.viewmodel.AnalyticsViewModel
 import com.castrodev.workouttracker.features.analytics.presentation.viewmodel.WeeklySummaryState
+import com.castrodev.workouttracker.features.bodyweight.presentation.components.AddBodyweightDialog
+import com.castrodev.workouttracker.features.bodyweight.presentation.components.BodyweightCard
+import com.castrodev.workouttracker.features.bodyweight.presentation.viewmodel.BodyweightState
+import com.castrodev.workouttracker.features.bodyweight.presentation.viewmodel.BodyweightViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnalyticsScreen(viewModel: AnalyticsViewModel = viewModel()) {
-    val summaryState by viewModel.summaryState.collectAsState()
+fun AnalyticsScreen(
+    analyticsViewModel: AnalyticsViewModel = viewModel(),
+    bodyweightViewModel: BodyweightViewModel = viewModel()
+) {
+    val summaryState    by analyticsViewModel.summaryState.collectAsState()
+    val bodyweightState by bodyweightViewModel.state.collectAsState()
+    val actionSuccess   by bodyweightViewModel.actionSuccess.collectAsState()
+    var showAddWeight   by remember { mutableStateOf(false) }
+
+    LaunchedEffect(actionSuccess) {
+        if (actionSuccess) { showAddWeight = false; bodyweightViewModel.resetActionSuccess() }
+    }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.analytics)) }) }
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.analytics)) }) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showAddWeight = true },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) { Icon(Icons.Default.Add, null) }
+        }
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(padding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             // Week selector
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = { viewModel.previousWeek() }) { Icon(Icons.Default.ChevronLeft, null) }
-                Text(
-                    text  = "${stringResource(R.string.week)} ${viewModel.selectedWeek} · ${viewModel.selectedYear}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                IconButton(onClick = { viewModel.nextWeek() }) { Icon(Icons.Default.ChevronRight, null) }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { analyticsViewModel.previousWeek() }) { Icon(Icons.Default.ChevronLeft, null) }
+                    Text(
+                        text  = "${stringResource(R.string.week)} ${analyticsViewModel.selectedWeek} · ${analyticsViewModel.selectedYear}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    IconButton(onClick = { analyticsViewModel.nextWeek() }) { Icon(Icons.Default.ChevronRight, null) }
+                }
             }
 
+            // Weekly stats
             when (val s = summaryState) {
-                is WeeklySummaryState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-                is WeeklySummaryState.Error   -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(s.message) }
+                is WeeklySummaryState.Loading -> item { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CircularProgressIndicator() } }
+                is WeeklySummaryState.Error   -> item { Text(s.message, color = MaterialTheme.colorScheme.error) }
                 is WeeklySummaryState.Success -> {
                     val summary = s.summary
-                    Column(
-                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // Stats cards
+                    item {
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            StatCard(
-                                label = stringResource(R.string.total_sessions),
-                                value = summary.totalSessions.toString(),
-                                modifier = Modifier.weight(1f)
-                            )
-                            StatCard(
-                                label = stringResource(R.string.total_volume),
-                                value = "${summary.totalVolumeKg} kg",
-                                modifier = Modifier.weight(1f)
-                            )
+                            StatCard(label = stringResource(R.string.total_sessions), value = summary.totalSessions.toString(), modifier = Modifier.weight(1f))
+                            StatCard(label = stringResource(R.string.total_volume), value = "${summary.totalVolumeKg} kg", modifier = Modifier.weight(1f))
                         }
-                        StatCard(
-                            label = stringResource(R.string.duration_minutes),
-                            value = "${summary.totalDurationMinutes} min",
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Sessions by day
-                        if (summary.sessionsByDay.isNotEmpty()) {
-                            Spacer(Modifier.height(8.dp))
+                    }
+                    item {
+                        StatCard(label = stringResource(R.string.duration_minutes), value = "${summary.totalDurationMinutes} min", modifier = Modifier.fillMaxWidth())
+                    }
+                    if (summary.sessionsByDay.isNotEmpty()) {
+                        item {
+                            Spacer(Modifier.height(4.dp))
                             Text(stringResource(R.string.weekly_summary), style = MaterialTheme.typography.titleMedium)
-                            summary.sessionsByDay.forEach { (day, count) ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(day, style = MaterialTheme.typography.bodyMedium)
-                                    Text("$count ${stringResource(R.string.sessions)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
-                                }
+                        }
+                        items(summary.sessionsByDay.entries.toList()) { (day, count) ->
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(day, style = MaterialTheme.typography.bodyMedium)
+                                Text("$count ${stringResource(R.string.sessions)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                             }
                         }
                     }
                 }
             }
+
+            // Bodyweight section
+            item {
+                Spacer(Modifier.height(4.dp))
+                Text(stringResource(R.string.bodyweight), style = MaterialTheme.typography.titleMedium)
+            }
+
+            when (val b = bodyweightState) {
+                is BodyweightState.Loading -> item { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
+                is BodyweightState.Error   -> item { Text(b.message, color = MaterialTheme.colorScheme.error) }
+                is BodyweightState.Success -> {
+                    if (b.entries.isEmpty()) {
+                        item { Text(stringResource(R.string.no_bodyweight), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) }
+                    } else {
+                        items(b.entries.take(10), key = { it.id }) { entry ->
+                            BodyweightCard(entry = entry)
+                        }
+                    }
+                }
+            }
+
+            item { Spacer(Modifier.height(80.dp)) }
         }
+    }
+
+    if (showAddWeight) {
+        AddBodyweightDialog(
+            onSave    = { weight, date, notes -> bodyweightViewModel.logWeight(weight, date, notes) },
+            onDismiss = { showAddWeight = false }
+        )
     }
 }
 

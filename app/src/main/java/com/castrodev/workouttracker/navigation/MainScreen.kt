@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.castrodev.workouttracker.R
 import com.castrodev.workouttracker.features.analytics.presentation.screen.AnalyticsScreen
 import com.castrodev.workouttracker.features.analytics.presentation.viewmodel.AnalyticsViewModel
+import com.castrodev.workouttracker.features.bodyweight.presentation.viewmodel.BodyweightViewModel
 import com.castrodev.workouttracker.features.routines.domain.entity.RoutineEntity
 import com.castrodev.workouttracker.features.routines.presentation.screen.RoutineDetailScreen
 import com.castrodev.workouttracker.features.routines.presentation.screen.RoutinesScreen
@@ -45,6 +46,7 @@ fun MainScreen(onLogout: () -> Unit) {
     val routineViewModel: RoutineViewModel   = viewModel()
     val sessionViewModel: SessionViewModel   = viewModel()
     val analyticsViewModel: AnalyticsViewModel = viewModel()
+    val bodyweightViewModel: BodyweightViewModel = viewModel()
     val tabs = listOf(BottomTab.Routines, BottomTab.Sessions, BottomTab.Analytics, BottomTab.Profile)
     val tabRoutes = tabs.map { it.route }
 
@@ -123,7 +125,10 @@ fun MainScreen(onLogout: () -> Unit) {
                 )
             }
             composable(BottomTab.Analytics.route) {
-                AnalyticsScreen(viewModel = analyticsViewModel)
+                AnalyticsScreen(
+                    analyticsViewModel  = analyticsViewModel,
+                    bodyweightViewModel = bodyweightViewModel
+                )
             }
             composable(BottomTab.Profile.route) {
                 // ProfileScreen — próximamente

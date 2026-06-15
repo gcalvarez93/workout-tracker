@@ -48,4 +48,5 @@
     <string name="notifications">Notificaciones</string>
     <string name="language">Idioma</string>
     <string name="language_hint">Cámbialo en los ajustes del teléfono</string>
+    <string name="no_bodyweight">Aún no hay registros de peso</string>
 </resources>
