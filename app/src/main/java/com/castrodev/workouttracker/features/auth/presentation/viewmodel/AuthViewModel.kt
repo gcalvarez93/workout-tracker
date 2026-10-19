@@ -3,9 +3,10 @@ package com.castrodev.workouttracker.features.auth.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.castrodev.workouttracker.features.auth.data.repository.AuthRepositoryImpl
 import com.castrodev.workouttracker.features.auth.domain.entity.UserEntity
 import com.castrodev.workouttracker.features.auth.domain.usecase.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,17 +18,19 @@ sealed class AuthState {
     data class Error(val message: String) : AuthState()
 }
 
-class AuthViewModel : ViewModel() {
-    private val repository       = AuthRepositoryImpl()
-    private val signIn           = SignInUseCase(repository)
-    private val signUp           = SignUpUseCase(repository)
-    private val signInWithGoogle = SignInWithGoogleUseCase(repository)
-    private val signOut          = SignOutUseCase(repository)
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val signIn: SignInUseCase,
+    private val signUp: SignUpUseCase,
+    private val signInWithGoogle: SignInWithGoogleUseCase,
+    private val signOut: SignOutUseCase,
+    isUserAuthenticated: IsAuthenticatedUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow<AuthState>(AuthState.Idle)
     val state: StateFlow<AuthState> = _state
 
-    private val _isAuthenticated = MutableStateFlow(repository.isAuthenticated())
+    private val _isAuthenticated = MutableStateFlow(isUserAuthenticated())
     val isAuthenticated: StateFlow<Boolean> = _isAuthenticated
 
     fun signIn(email: String, password: String) {

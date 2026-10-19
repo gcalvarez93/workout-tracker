@@ -1,7 +1,10 @@
 // Path: app/src/main/java/com/castrodev/workouttracker/features/sessions/data/model/SessionModel.kt
 package com.castrodev.workouttracker.features.sessions.data.model
 
-import com.castrodev.workouttracker.features.sessions.domain.entity.*
+import com.castrodev.workouttracker.features.sessions.domain.entity.CompletedExercise
+import com.castrodev.workouttracker.features.sessions.domain.entity.SessionEntity
+import com.castrodev.workouttracker.features.sessions.domain.entity.SessionExerciseEntity
+import com.castrodev.workouttracker.features.sessions.domain.entity.SessionSetEntity
 
 data class SessionModel(
     val id: String = "",
@@ -29,7 +32,22 @@ data class SessionSetModel(val reps: Int = 0, val weightKg: Double = 0.0, val co
 
 data class StartSessionRequest(val routineId: String)
 
-data class CompleteSessionRequest(val exercises: List<CompleteSessionExerciseRequest>)
+data class CompleteSessionRequest(val exercises: List<CompleteSessionExerciseRequest>) {
+    companion object {
+        fun from(exercises: List<CompletedExercise>) = CompleteSessionRequest(
+            exercises.map { exercise ->
+                CompleteSessionExerciseRequest(
+                    exerciseId = exercise.id,
+                    name = exercise.name,
+                    sets = exercise.sets.map {
+                        CompleteSessionSetRequest(it.setNumber, it.reps, it.weightKg, it.isCompleted)
+                    },
+                    isCompleted = exercise.isCompleted
+                )
+            }
+        )
+    }
+}
 data class CompleteSessionExerciseRequest(
     val exerciseId: String,
     val name: String,

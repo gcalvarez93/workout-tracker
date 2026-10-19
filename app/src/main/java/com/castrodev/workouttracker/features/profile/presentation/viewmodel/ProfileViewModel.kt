@@ -3,10 +3,11 @@ package com.castrodev.workouttracker.features.profile.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.castrodev.workouttracker.features.profile.data.repository.ProfileRepositoryImpl
 import com.castrodev.workouttracker.features.profile.domain.entity.ProfileEntity
 import com.castrodev.workouttracker.features.profile.domain.usecase.GetProfileUseCase
 import com.castrodev.workouttracker.features.profile.domain.usecase.UpdateProfileUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,10 +18,11 @@ sealed class ProfileState {
     data class Error(val message: String) : ProfileState()
 }
 
-class ProfileViewModel : ViewModel() {
-    private val repository    = ProfileRepositoryImpl()
-    private val getProfile    = GetProfileUseCase(repository)
-    private val updateProfile = UpdateProfileUseCase(repository)
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val getProfile: GetProfileUseCase,
+    private val updateProfile: UpdateProfileUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow<ProfileState>(ProfileState.Loading)
     val state: StateFlow<ProfileState> = _state

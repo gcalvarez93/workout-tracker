@@ -3,10 +3,11 @@ package com.castrodev.workouttracker.features.sessions.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.castrodev.workouttracker.features.sessions.data.model.*
-import com.castrodev.workouttracker.features.sessions.data.repository.SessionRepositoryImpl
+import com.castrodev.workouttracker.features.sessions.domain.entity.CompletedExercise
 import com.castrodev.workouttracker.features.sessions.domain.entity.SessionEntity
 import com.castrodev.workouttracker.features.sessions.domain.usecase.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -25,11 +26,12 @@ sealed class ActiveSessionState {
     data class Error(val message: String) : ActiveSessionState()
 }
 
-class SessionViewModel : ViewModel() {
-    private val repository      = SessionRepositoryImpl()
-    private val getSessions     = GetSessionsUseCase(repository)
-    private val startSession    = StartSessionUseCase(repository)
-    private val completeSession = CompleteSessionUseCase(repository)
+@HiltViewModel
+class SessionViewModel @Inject constructor(
+    private val getSessions: GetSessionsUseCase,
+    private val startSession: StartSessionUseCase,
+    private val completeSession: CompleteSessionUseCase
+) : ViewModel() {
 
     private val _sessionsState = MutableStateFlow<SessionsState>(SessionsState.Loading)
     val sessionsState: StateFlow<SessionsState> = _sessionsState
@@ -57,10 +59,9 @@ class SessionViewModel : ViewModel() {
         }
     }
 
-    fun completeSession(sessionId: String, exercises: List<CompleteSessionExerciseRequest>) {
+    fun completeSession(sessionId: String, exercises: List<CompletedExercise>) {
         viewModelScope.launch {
-            val request = CompleteSessionRequest(exercises)
-            completeSession.invoke(sessionId, request)
+            completeSession.invoke(sessionId, exercises)
                 .onSuccess { _activeState.value = ActiveSessionState.Completed; loadSessions() }
                 .onFailure { _activeState.value = ActiveSessionState.Error(it.message ?: "Error") }
         }

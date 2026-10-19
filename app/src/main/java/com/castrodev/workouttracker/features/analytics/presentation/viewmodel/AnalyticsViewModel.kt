@@ -3,15 +3,16 @@ package com.castrodev.workouttracker.features.analytics.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.castrodev.workouttracker.features.analytics.data.repository.AnalyticsRepositoryImpl
 import com.castrodev.workouttracker.features.analytics.domain.entity.ExerciseProgressEntity
 import com.castrodev.workouttracker.features.analytics.domain.entity.WeeklySummaryEntity
 import com.castrodev.workouttracker.features.analytics.domain.usecase.GetExerciseProgressUseCase
 import com.castrodev.workouttracker.features.analytics.domain.usecase.GetWeeklyAnalyticsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Calendar
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 sealed class WeeklySummaryState {
     object Loading : WeeklySummaryState()
@@ -26,10 +27,11 @@ sealed class ExerciseProgressState {
     data class Error(val message: String) : ExerciseProgressState()
 }
 
-class AnalyticsViewModel : ViewModel() {
-    private val repository          = AnalyticsRepositoryImpl()
-    private val getWeeklySummary    = GetWeeklyAnalyticsUseCase(repository)
-    private val getExerciseProgress = GetExerciseProgressUseCase(repository)
+@HiltViewModel
+class AnalyticsViewModel @Inject constructor(
+    private val getWeeklySummary: GetWeeklyAnalyticsUseCase,
+    private val getExerciseProgress: GetExerciseProgressUseCase
+) : ViewModel() {
 
     private val _summaryState = MutableStateFlow<WeeklySummaryState>(WeeklySummaryState.Loading)
     val summaryState: StateFlow<WeeklySummaryState> = _summaryState

@@ -15,7 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.castrodev.workouttracker.R
 import com.castrodev.workouttracker.features.routines.domain.entity.RoutineEntity
-import com.castrodev.workouttracker.features.sessions.data.model.*
+import com.castrodev.workouttracker.features.sessions.domain.entity.CompletedExercise
+import com.castrodev.workouttracker.features.sessions.domain.entity.CompletedSet
 import com.castrodev.workouttracker.features.sessions.presentation.viewmodel.ActiveSessionState
 import com.castrodev.workouttracker.features.sessions.presentation.viewmodel.SessionViewModel
 
@@ -34,7 +35,7 @@ fun ActiveSessionScreen(
         routine.exercises.map { exercise ->
             exercise to (1..exercise.sets).map { setNum ->
                 mutableStateOf(
-                    CompleteSessionSetRequest(
+                    CompletedSet(
                         setNumber   = setNum,
                         reps        = exercise.reps,
                         weightKg    = exercise.weightKg,
@@ -96,8 +97,8 @@ fun ActiveSessionScreen(
                 Button(
                     onClick = {
                         val exercises = exerciseStates.mapIndexed { index, (exercise, sets) ->
-                            CompleteSessionExerciseRequest(
-                                exerciseId  = index.toString(),
+                            CompletedExercise(
+                                id          = index.toString(),
                                 name        = exercise.name,
                                 sets        = sets.map { it.value },
                                 isCompleted = sets.any { it.value.isCompleted }

@@ -4,7 +4,7 @@ package com.castrodev.workouttracker.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -15,7 +15,7 @@ import com.castrodev.workouttracker.features.auth.presentation.viewmodel.AuthVie
 @Composable
 fun AppNavigation() {
     val navController   = rememberNavController()
-    val authViewModel: AuthViewModel = viewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
     val startDestination = if (isAuthenticated) Screen.Main.route else Screen.Login.route

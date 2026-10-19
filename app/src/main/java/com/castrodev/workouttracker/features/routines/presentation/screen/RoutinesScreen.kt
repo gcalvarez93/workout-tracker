@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.castrodev.workouttracker.R
 import com.castrodev.workouttracker.features.routines.presentation.components.RoutineCard
 import com.castrodev.workouttracker.features.routines.presentation.components.RoutineFormSheet
@@ -22,7 +22,7 @@ import com.castrodev.workouttracker.features.routines.presentation.viewmodel.Rou
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutinesScreen(
-    viewModel: RoutineViewModel = viewModel(),
+    viewModel: RoutineViewModel = hiltViewModel(),
     onNavigateToDetail: (String) -> Unit
 ) {
     val state         by viewModel.routinesState.collectAsState()

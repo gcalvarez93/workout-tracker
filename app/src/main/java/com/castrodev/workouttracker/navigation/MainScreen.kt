@@ -12,7 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -46,12 +46,12 @@ sealed class BottomTab(val route: String, val labelRes: Int, val icon: ImageVect
 @Composable
 fun MainScreen(onLogout: () -> Unit) {
     val navController                      = rememberNavController()
-    val authViewModel: AuthViewModel       = viewModel()
-    val routineViewModel: RoutineViewModel = viewModel()
-    val sessionViewModel: SessionViewModel = viewModel()
-    val analyticsViewModel: AnalyticsViewModel = viewModel()
-    val bodyweightViewModel: BodyweightViewModel = viewModel()
-    val profileViewModel: ProfileViewModel = viewModel()
+    val authViewModel: AuthViewModel       = hiltViewModel()
+    val routineViewModel: RoutineViewModel = hiltViewModel()
+    val sessionViewModel: SessionViewModel = hiltViewModel()
+    val analyticsViewModel: AnalyticsViewModel = hiltViewModel()
+    val bodyweightViewModel: BodyweightViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
     val tabs = listOf(BottomTab.Routines, BottomTab.Sessions, BottomTab.Analytics, BottomTab.Profile)
     val tabRoutes = tabs.map { it.route }
 

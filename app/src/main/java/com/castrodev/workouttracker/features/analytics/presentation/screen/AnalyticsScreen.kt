@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.castrodev.workouttracker.R
 import com.castrodev.workouttracker.features.analytics.presentation.viewmodel.AnalyticsViewModel
 import com.castrodev.workouttracker.features.analytics.presentation.viewmodel.WeeklySummaryState
@@ -28,8 +28,8 @@ import com.castrodev.workouttracker.features.bodyweight.presentation.viewmodel.B
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(
-    analyticsViewModel: AnalyticsViewModel = viewModel(),
-    bodyweightViewModel: BodyweightViewModel = viewModel()
+    analyticsViewModel: AnalyticsViewModel = hiltViewModel(),
+    bodyweightViewModel: BodyweightViewModel = hiltViewModel()
 ) {
     val summaryState    by analyticsViewModel.summaryState.collectAsState()
     val bodyweightState by bodyweightViewModel.state.collectAsState()

@@ -3,10 +3,11 @@ package com.castrodev.workouttracker.features.bodyweight.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.castrodev.workouttracker.features.bodyweight.data.repository.BodyweightRepositoryImpl
 import com.castrodev.workouttracker.features.bodyweight.domain.entity.BodyweightEntity
 import com.castrodev.workouttracker.features.bodyweight.domain.usecase.AddBodyweightUseCase
 import com.castrodev.workouttracker.features.bodyweight.domain.usecase.GetBodyweightHistoryUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,10 +18,11 @@ sealed class BodyweightState {
     data class Error(val message: String) : BodyweightState()
 }
 
-class BodyweightViewModel : ViewModel() {
-    private val repository  = BodyweightRepositoryImpl()
-    private val getHistory  = GetBodyweightHistoryUseCase(repository)
-    private val addWeight   = AddBodyweightUseCase(repository)
+@HiltViewModel
+class BodyweightViewModel @Inject constructor(
+    private val getHistory: GetBodyweightHistoryUseCase,
+    private val addWeight: AddBodyweightUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow<BodyweightState>(BodyweightState.Loading)
     val state: StateFlow<BodyweightState> = _state

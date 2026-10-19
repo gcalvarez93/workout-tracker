@@ -3,9 +3,10 @@ package com.castrodev.workouttracker.features.routines.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.castrodev.workouttracker.features.routines.data.repository.RoutineRepositoryImpl
 import com.castrodev.workouttracker.features.routines.domain.entity.RoutineEntity
 import com.castrodev.workouttracker.features.routines.domain.usecase.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,13 +24,14 @@ sealed class RoutineDetailState {
     data class Error(val message: String) : RoutineDetailState()
 }
 
-class RoutineViewModel : ViewModel() {
-    private val repository    = RoutineRepositoryImpl()
-    private val getRoutines   = GetRoutinesUseCase(repository)
-    private val getRoutineById = GetRoutineByIdUseCase(repository)
-    private val createRoutine = CreateRoutineUseCase(repository)
-    private val updateRoutine = UpdateRoutineUseCase(repository)
-    private val deleteRoutine = DeleteRoutineUseCase(repository)
+@HiltViewModel
+class RoutineViewModel @Inject constructor(
+    private val getRoutines: GetRoutinesUseCase,
+    private val getRoutineById: GetRoutineByIdUseCase,
+    private val createRoutine: CreateRoutineUseCase,
+    private val updateRoutine: UpdateRoutineUseCase,
+    private val deleteRoutine: DeleteRoutineUseCase
+) : ViewModel() {
 
     private val _routinesState = MutableStateFlow<RoutinesState>(RoutinesState.Loading)
     val routinesState: StateFlow<RoutinesState> = _routinesState

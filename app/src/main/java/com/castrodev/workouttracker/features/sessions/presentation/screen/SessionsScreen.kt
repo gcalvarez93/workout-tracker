@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.castrodev.workouttracker.R
 import com.castrodev.workouttracker.features.sessions.presentation.components.SessionCard
 import com.castrodev.workouttracker.features.sessions.presentation.viewmodel.SessionViewModel
@@ -18,7 +18,7 @@ import com.castrodev.workouttracker.features.sessions.presentation.viewmodel.Ses
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SessionsScreen(viewModel: SessionViewModel = viewModel()) {
+fun SessionsScreen(viewModel: SessionViewModel = hiltViewModel()) {
     val state by viewModel.sessionsState.collectAsState()
 
     Scaffold(

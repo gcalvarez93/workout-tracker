@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.castrodev.workouttracker.R
 import com.castrodev.workouttracker.features.auth.presentation.viewmodel.AuthViewModel
 import com.castrodev.workouttracker.features.profile.domain.entity.ProfileEntity
@@ -29,7 +29,7 @@ import com.castrodev.workouttracker.features.profile.presentation.viewmodel.Prof
 fun ProfileScreen(
     authViewModel: AuthViewModel,
     onLogout: () -> Unit,
-    profileViewModel: ProfileViewModel = viewModel()
+    profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val state by profileViewModel.state.collectAsState()
 
