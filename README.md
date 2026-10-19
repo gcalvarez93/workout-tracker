@@ -1,6 +1,6 @@
 # Workout Tracker
 
-An Android workout tracking app built as part of the [CastroDev](https://castrodev.com) portfolio. Create and manage your workout routines, track your training sessions with exercise sets and reps, monitor your weekly analytics and body weight evolution.
+An Android workout tracking app built as part of the CastroDev portfolio. Create and manage your workout routines, track your training sessions with exercise sets and reps, monitor your weekly analytics and body weight evolution.
 
 ---
 
@@ -154,13 +154,12 @@ Then:
 ## 🔗 Related
 
 - [CastroDev API](https://github.com/gcalvarez93/castrodev-api) — Shared .NET 10 backend
-- [castrodev.com](https://castrodev.com) — Portfolio
 
 ---
 
 ## 📄 License
 
-MIT © [Gabriel Castro](https://castrodev.com)
+MIT © Gabriel Castro
 
 ---
 
@@ -168,7 +167,7 @@ MIT © [Gabriel Castro](https://castrodev.com)
 
 # Workout Tracker
 
-App Android de seguimiento de entrenamientos desarrollada como parte del portfolio de [CastroDev](https://castrodev.com). Crea y gestiona tus rutinas de entrenamiento, registra tus sesiones con los ejercicios completados, y monitoriza tu progreso semanal y tu evolución de peso corporal.
+App Android de seguimiento de entrenamientos desarrollada como parte del portfolio de CastroDev. Crea y gestiona tus rutinas de entrenamiento, registra tus sesiones con los ejercicios completados, y monitoriza tu progreso semanal y tu evolución de peso corporal.
 
 ---
 
@@ -266,10 +265,9 @@ A continuación:
 ## 🔗 Relacionado
 
 - [CastroDev API](https://github.com/gcalvarez93/castrodev-api) — Backend compartido en .NET 10
-- [castrodev.com](https://castrodev.com) — Portfolio
 
 ---
 
 ## 📄 Licencia
 
-MIT © [Gabriel Castro](https://castrodev.com)
+MIT © Gabriel Castro
