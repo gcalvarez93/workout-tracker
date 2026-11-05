@@ -1,6 +1,7 @@
 // Path: app/src/test/java/com/castrodev/workouttracker/features/routines/domain/usecase/CreateRoutineUseCaseTest.kt
 package com.castrodev.workouttracker.features.routines.domain.usecase
 
+import com.castrodev.workouttracker.core.error.AppError
 import com.castrodev.workouttracker.fakes.FakeRoutineRepository
 import com.castrodev.workouttracker.fakes.testRoutine
 import kotlinx.coroutines.test.runTest
@@ -21,10 +22,11 @@ class CreateRoutineUseCaseTest {
     }
 
     @Test
-    fun `rechaza una rutina sin nombre y no llama al repositorio`() = runTest {
-        val result = useCase(testRoutine(name = ""))
+    fun `rechaza una rutina sin nombre con un error de validacion y no llama al repositorio`() = runTest {
+        val error = useCase(testRoutine(name = "")).exceptionOrNull()
 
-        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+        assertTrue(error is AppError.Validation)
+        assertEquals(AppError.Validation.Reason.RoutineNameRequired, (error as AppError.Validation).reason)
         assertTrue(repository.created.isEmpty())
     }
 
@@ -32,7 +34,7 @@ class CreateRoutineUseCaseTest {
     fun `rechaza un nombre formado solo por espacios`() = runTest {
         val result = useCase(testRoutine(name = "   "))
 
-        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is AppError.Validation)
         assertTrue(repository.created.isEmpty())
     }
 

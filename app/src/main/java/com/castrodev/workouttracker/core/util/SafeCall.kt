@@ -8,8 +8,12 @@ import timber.log.Timber
  * Ejecuta [block] y devuelve su resultado envuelto en [Result].
  *
  * A diferencia de `runCatching`, no captura [CancellationException]: si la
- * corrutina se cancela, la cancelación se propaga. El resto de errores se
- * registran con Timber indicando el [context] en el que ocurrieron.
+ * corrutina se cancela, la cancelación se propaga.
+ *
+ * El resto de errores se registran con Timber (con la excepción original y el
+ * [context] en el que ocurrieron) y se devuelven ya traducidos a un
+ * [com.castrodev.workouttracker.core.error.AppError], para que las capas superiores
+ * nunca dependan de Retrofit ni de Firebase.
  */
 suspend fun <T> safeCall(context: String, block: suspend () -> T): Result<T> =
     try {
@@ -18,5 +22,5 @@ suspend fun <T> safeCall(context: String, block: suspend () -> T): Result<T> =
         throw e
     } catch (e: Exception) {
         Timber.e(e, context)
-        Result.failure(e)
+        Result.failure(e.toAppError())
     }

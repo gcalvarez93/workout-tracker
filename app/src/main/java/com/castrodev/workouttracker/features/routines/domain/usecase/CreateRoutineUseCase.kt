@@ -1,13 +1,15 @@
 // Path: app/src/main/java/com/castrodev/workouttracker/features/routines/domain/usecase/CreateRoutineUseCase.kt
 package com.castrodev.workouttracker.features.routines.domain.usecase
 
+import com.castrodev.workouttracker.core.error.AppError
 import com.castrodev.workouttracker.features.routines.domain.entity.RoutineEntity
 import com.castrodev.workouttracker.features.routines.domain.repository.RoutineRepository
 import javax.inject.Inject
 
 class CreateRoutineUseCase @Inject constructor(private val repository: RoutineRepository) {
     suspend operator fun invoke(routine: RoutineEntity): Result<String> {
-        if (routine.name.isBlank()) return Result.failure(IllegalArgumentException("Name cannot be empty"))
+        if (routine.name.isBlank())
+            return Result.failure(AppError.Validation(AppError.Validation.Reason.RoutineNameRequired))
         return repository.createRoutine(routine)
     }
 }

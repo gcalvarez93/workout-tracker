@@ -1,7 +1,8 @@
-/// Path: app/src/main/java/com/castrodev/workouttracker/navigation/AppNavigation.kt
+// Path: app/src/main/java/com/castrodev/workouttracker/navigation/AppNavigation.kt
 package com.castrodev.workouttracker.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +20,18 @@ fun AppNavigation() {
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
     val startDestination = if (isAuthenticated) Screen.Main.route else Screen.Login.route
+
+    // Si la capa de red da la sesión por caducada (401 que no se arregla renovando el token),
+    // se cierra la sesión y se vuelve al login, donde se explica el motivo.
+    LaunchedEffect(Unit) {
+        authViewModel.sessionExpired.collect {
+            if (authViewModel.onSessionExpired()) {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(Screen.Main.route) { inclusive = true }
+                }
+            }
+        }
+    }
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Login.route) {

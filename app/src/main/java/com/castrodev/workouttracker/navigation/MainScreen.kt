@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -35,6 +36,7 @@ import com.castrodev.workouttracker.features.sessions.presentation.screen.Active
 import com.castrodev.workouttracker.features.sessions.presentation.screen.SessionsScreen
 import com.castrodev.workouttracker.features.sessions.presentation.viewmodel.ActiveSessionState
 import com.castrodev.workouttracker.features.sessions.presentation.viewmodel.SessionViewModel
+import kotlinx.coroutines.launch
 
 sealed class BottomTab(val route: String, val labelRes: Int, val icon: ImageVector) {
     object Routines  : BottomTab("routines",  R.string.routines,  Icons.Default.FitnessCenter)
@@ -58,15 +60,28 @@ fun MainScreen(onLogout: () -> Unit) {
     var selectedRoutine by remember { mutableStateOf<RoutineEntity?>(null) }
     val activeState     by sessionViewModel.activeState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val resources         = LocalResources.current
+    val scope             = rememberCoroutineScope()
 
     LaunchedEffect(activeState) {
-        if (activeState is ActiveSessionState.Active) {
-            val sessionId = (activeState as ActiveSessionState.Active).sessionId
-            navController.navigate(InnerScreen.ActiveSession.createRoute(sessionId))
+        val current = activeState
+        if (current is ActiveSessionState.Active) {
+            navController.navigate(InnerScreen.ActiveSession.createRoute(current.sessionId))
+        }
+        // En la pantalla de la sesión el error se ve ahí mismo. En cualquier otra (por ejemplo,
+        // al iniciarla desde el detalle de una rutina) se avisa con un snackbar.
+        if (current is ActiveSessionState.Error &&
+            navController.currentDestination?.route != InnerScreen.ActiveSession.route
+        ) {
+            val message = resources.getString(current.messageRes)
+            sessionViewModel.resetActiveSession()
+            scope.launch { snackbarHostState.showSnackbar(message) }
         }
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             val currentDestination = navBackStackEntry?.destination
             val showBottomBar = tabRoutes.any { route ->

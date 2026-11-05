@@ -48,4 +48,21 @@
     <string name="language">Language</string>
     <string name="language_hint">Change in your phone settings</string>
     <string name="no_bodyweight">No weight entries yet</string>
+
+    <string name="set_label">Set</string>
+
+    <!-- Errors shown to the user. Technical detail goes to the log, never to the screen. -->
+    <string name="error_network">No internet connection. Check your network and try again.</string>
+    <string name="error_server">The server is having problems. Please try again later.</string>
+    <string name="error_timeout">The request took too long. Check your connection and try again.</string>
+    <string name="error_forbidden">You do not have permission to do this.</string>
+    <string name="error_unauthorized">Your session is no longer valid. Please sign in again.</string>
+    <string name="error_not_found">We could not find what you were looking for.</string>
+    <string name="error_too_many_requests">Too many attempts. Please wait a moment and try again.</string>
+    <string name="error_invalid_credentials">Incorrect email or password.</string>
+    <string name="error_invalid_email">Enter a valid email address.</string>
+    <string name="error_email_in_use">An account with this email already exists.</string>
+    <string name="error_weak_password">The password is too weak. Use at least 6 characters.</string>
+    <string name="error_unknown">Something went wrong. Please try again.</string>
+    <string name="validation_routine_name_required">The routine needs a name.</string>
 </resources>

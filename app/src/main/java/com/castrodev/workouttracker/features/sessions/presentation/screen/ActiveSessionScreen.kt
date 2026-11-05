@@ -64,7 +64,7 @@ fun ActiveSessionScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (state is ActiveSessionState.Error) {
-                item { Text((state as ActiveSessionState.Error).message, color = MaterialTheme.colorScheme.error) }
+                item { Text(stringResource((state as ActiveSessionState.Error).messageRes), color = MaterialTheme.colorScheme.error) }
             }
 
             itemsIndexed(exerciseStates) { _, (exercise, sets) ->
@@ -78,8 +78,8 @@ fun ActiveSessionScreen(
                                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Set ${set.setNumber}", style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(48.dp))
-                                Text("${set.reps} reps · ${set.weightKg} kg", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                                Text("${stringResource(R.string.set_label)} ${set.setNumber}", style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(56.dp))
+                                Text("${set.reps} ${stringResource(R.string.reps)} · ${set.weightKg} ${stringResource(R.string.kg)}", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
                                 Checkbox(
                                     checked = set.isCompleted,
                                     onCheckedChange = { checked ->

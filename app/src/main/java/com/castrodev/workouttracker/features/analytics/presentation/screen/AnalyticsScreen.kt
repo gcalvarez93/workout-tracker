@@ -34,6 +34,8 @@ fun AnalyticsScreen(
     val summaryState    by analyticsViewModel.summaryState.collectAsState()
     val bodyweightState by bodyweightViewModel.state.collectAsState()
     val actionSuccess   by bodyweightViewModel.actionSuccess.collectAsState()
+    val isSaving        by bodyweightViewModel.isSaving.collectAsState()
+    val actionError     by bodyweightViewModel.actionError.collectAsState()
     var showAddWeight   by remember { mutableStateOf(false) }
 
     LaunchedEffect(actionSuccess) {
@@ -44,7 +46,7 @@ fun AnalyticsScreen(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.analytics)) }) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showAddWeight = true },
+                onClick = { bodyweightViewModel.clearActionError(); showAddWeight = true },
                 containerColor = MaterialTheme.colorScheme.primary
             ) { Icon(Icons.Default.Add, null) }
         }
@@ -73,7 +75,7 @@ fun AnalyticsScreen(
             // Weekly stats
             when (val s = summaryState) {
                 is WeeklySummaryState.Loading -> item { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CircularProgressIndicator() } }
-                is WeeklySummaryState.Error   -> item { Text(s.message, color = MaterialTheme.colorScheme.error) }
+                is WeeklySummaryState.Error   -> item { Text(stringResource(s.messageRes), color = MaterialTheme.colorScheme.error) }
                 is WeeklySummaryState.Success -> {
                     val summary = s.summary
                     item {
@@ -108,7 +110,7 @@ fun AnalyticsScreen(
 
             when (val b = bodyweightState) {
                 is BodyweightState.Loading -> item { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
-                is BodyweightState.Error   -> item { Text(b.message, color = MaterialTheme.colorScheme.error) }
+                is BodyweightState.Error   -> item { Text(stringResource(b.messageRes), color = MaterialTheme.colorScheme.error) }
                 is BodyweightState.Success -> {
                     if (b.entries.isEmpty()) {
                         item { Text(stringResource(R.string.no_bodyweight), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) }
@@ -127,7 +129,9 @@ fun AnalyticsScreen(
     if (showAddWeight) {
         AddBodyweightDialog(
             onSave    = { weight, date, notes -> bodyweightViewModel.logWeight(weight, date, notes) },
-            onDismiss = { showAddWeight = false }
+            onDismiss = { showAddWeight = false; bodyweightViewModel.clearActionError() },
+            isSaving  = isSaving,
+            errorRes  = actionError
         )
     }
 }

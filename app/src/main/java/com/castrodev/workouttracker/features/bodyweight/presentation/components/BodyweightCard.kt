@@ -1,6 +1,7 @@
 // Path: app/src/main/java/com/castrodev/workouttracker/features/bodyweight/presentation/components/BodyweightCard.kt
 package com.castrodev.workouttracker.features.bodyweight.presentation.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -44,11 +45,19 @@ fun BodyweightCard(
     }
 }
 
+/**
+ * Diálogo para registrar un peso.
+ *
+ * [isSaving] desactiva el botón mientras se guarda, y [errorRes] muestra dentro del diálogo el
+ * error de un guardado fallido: el diálogo sigue abierto y lo escrito no se pierde.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBodyweightDialog(
     onSave: (Double, String, String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isSaving: Boolean = false,
+    @StringRes errorRes: Int? = null
 ) {
     var weight by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
     var notes  by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
@@ -72,12 +81,19 @@ fun AddBodyweightDialog(
                     label         = { Text(stringResource(R.string.notes)) },
                     modifier      = Modifier.fillMaxWidth()
                 )
+                if (errorRes != null) {
+                    Text(
+                        text  = stringResource(errorRes),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         },
         confirmButton = {
             TextButton(
                 onClick  = { weight.toDoubleOrNull()?.let { onSave(it, today, notes) } },
-                enabled  = weight.toDoubleOrNull() != null
+                enabled  = weight.toDoubleOrNull() != null && !isSaving
             ) { Text(stringResource(R.string.save)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }

@@ -1,6 +1,7 @@
 // Path: app/src/test/java/com/castrodev/workouttracker/features/sessions/data/repository/SessionRepositoryImplTest.kt
 package com.castrodev.workouttracker.features.sessions.data.repository
 
+import com.castrodev.workouttracker.core.error.AppError
 import com.castrodev.workouttracker.features.sessions.data.datasource.SessionRemoteDataSource
 import com.castrodev.workouttracker.features.sessions.data.model.CompleteSessionRequest
 import com.castrodev.workouttracker.features.sessions.data.model.SessionExerciseModel
@@ -14,6 +15,7 @@ import io.mockk.slot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
@@ -56,11 +58,14 @@ class SessionRepositoryImplTest {
     }
 
     @Test
-    fun `getSessions devuelve fallo cuando falla la red`() = runTest {
-        val error = IOException("sin red")
-        coEvery { dataSource.getSessions(any()) } throws error
+    fun `getSessions traduce un fallo de red a AppError Network y conserva la causa`() = runTest {
+        val cause = IOException("sin red")
+        coEvery { dataSource.getSessions(any()) } throws cause
 
-        assertEquals(error, repository.getSessions(null).exceptionOrNull())
+        val failure = repository.getSessions(null).exceptionOrNull()
+
+        assertTrue(failure is AppError.Network)
+        assertSame(cause, failure?.cause)
     }
 
     @Test

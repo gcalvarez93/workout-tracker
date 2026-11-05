@@ -1,6 +1,7 @@
 // Path: app/src/main/java/com/castrodev/workouttracker/features/routines/presentation/components/RoutineFormSheet.kt
 package com.castrodev.workouttracker.features.routines.presentation.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,12 +26,20 @@ private data class ExerciseForm(
     val restSeconds: String = "60"
 )
 
+/**
+ * Hoja para crear o editar una rutina.
+ *
+ * [isSaving] desactiva el botón mientras se guarda, y [errorRes] muestra dentro de la hoja el
+ * error de un guardado fallido: la hoja sigue abierta y lo escrito no se pierde.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutineFormSheet(
     routine: RoutineEntity? = null,
     onSave: (RoutineEntity) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isSaving: Boolean = false,
+    @StringRes errorRes: Int? = null
 ) {
     var name        by remember { mutableStateOf(routine?.name ?: "") }
     var description by remember { mutableStateOf(routine?.description ?: "") }
@@ -120,6 +129,15 @@ fun RoutineFormSheet(
             }
             Spacer(Modifier.height(24.dp))
 
+            if (errorRes != null) {
+                Text(
+                    text  = stringResource(errorRes),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+
             Button(
                 onClick = {
                     onSave(RoutineEntity(
@@ -136,9 +154,12 @@ fun RoutineFormSheet(
                         createdAt = routine?.createdAt ?: ""
                     ))
                 },
-                enabled  = name.isNotBlank(),
+                enabled  = name.isNotBlank() && !isSaving,
                 modifier = Modifier.fillMaxWidth()
-            ) { Text(stringResource(R.string.save)) }
+            ) {
+                if (isSaving) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                else Text(stringResource(R.string.save))
+            }
             Spacer(Modifier.height(32.dp))
         }
     }

@@ -27,7 +27,7 @@ fun SessionsScreen(viewModel: SessionViewModel = hiltViewModel()) {
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (val s = state) {
                 is SessionsState.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                is SessionsState.Error   -> Text(s.message, modifier = Modifier.align(Alignment.Center))
+                is SessionsState.Error   -> Text(stringResource(s.messageRes), modifier = Modifier.align(Alignment.Center))
                 is SessionsState.Success -> {
                     if (s.sessions.isEmpty()) {
                         Text(stringResource(R.string.no_sessions), modifier = Modifier.align(Alignment.Center))

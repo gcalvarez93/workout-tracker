@@ -73,7 +73,7 @@ fun LoginScreen(
             Spacer(Modifier.height(24.dp))
 
             if (state is AuthState.Error) {
-                Text((state as AuthState.Error).message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource((state as AuthState.Error).messageRes), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(8.dp))
             }
 

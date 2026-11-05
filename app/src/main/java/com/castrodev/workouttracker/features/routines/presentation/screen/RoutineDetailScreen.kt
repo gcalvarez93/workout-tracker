@@ -31,6 +31,8 @@ fun RoutineDetailScreen(
 ) {
     val state         by viewModel.detailState.collectAsState()
     val actionSuccess by viewModel.actionSuccess.collectAsState()
+    val isSaving      by viewModel.isSaving.collectAsState()
+    val actionError   by viewModel.actionError.collectAsState()
     var showEditSheet    by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -46,7 +48,7 @@ fun RoutineDetailScreen(
                 navigationIcon = { IconButton(onClick = onNavigateBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } },
                 actions = {
                     if (state is RoutineDetailState.Success) {
-                        IconButton(onClick = { showEditSheet = true }) { Icon(Icons.Default.Edit, null) }
+                        IconButton(onClick = { viewModel.clearActionError(); showEditSheet = true }) { Icon(Icons.Default.Edit, null) }
                         IconButton(onClick = { showDeleteDialog = true }) { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) }
                     }
                 }
@@ -56,7 +58,7 @@ fun RoutineDetailScreen(
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (val s = state) {
                 is RoutineDetailState.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                is RoutineDetailState.Error   -> Text(s.message, modifier = Modifier.align(Alignment.Center))
+                is RoutineDetailState.Error   -> Text(stringResource(s.messageRes), modifier = Modifier.align(Alignment.Center))
                 is RoutineDetailState.Success -> {
                     val routine = s.routine
                     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -97,7 +99,13 @@ fun RoutineDetailScreen(
                     }
 
                     if (showEditSheet) {
-                        RoutineFormSheet(routine = routine, onSave = { viewModel.update(it) }, onDismiss = { showEditSheet = false })
+                        RoutineFormSheet(
+                            routine   = routine,
+                            onSave    = { viewModel.update(it) },
+                            onDismiss = { showEditSheet = false; viewModel.clearActionError() },
+                            isSaving  = isSaving,
+                            errorRes  = actionError
+                        )
                     }
                 }
                 else -> Unit
@@ -105,6 +113,7 @@ fun RoutineDetailScreen(
         }
     }
 
+    // Si el borrado falla, el aviso lo da la lista (ver RoutinesScreen), porque aquí ya se ha vuelto atrás.
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
