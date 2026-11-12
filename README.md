@@ -112,6 +112,14 @@ Feature/
 - **Tests with fakes and MockK.** Use cases, repositories, remote data sources, all the ViewModels, `safeCall`, the error mapping, the auth interceptor and the 401 authenticator are covered with in-memory fakes of the domain interfaces. MockK is used where the collaborator is a concrete class or the Retrofit service, and to stand in for Firebase exceptions, whose constructors do not run in JVM tests. Snackbars, dialogs and sheets are not covered by UI tests.
 - **Google sign-in is wired but has no screen.** The data source, repository, use case and ViewModel support signing in with a Google ID token, but the login screen only offers email and password, so it is not user-facing yet.
 
+### Known limitations
+
+Deliberate technical debt, documented rather than hidden:
+
+- **No UI tests.** Snackbars, dialogs and sheets are covered by manual checks only; the automated tests stop at the ViewModels.
+- **Google sign-in has no screen.** The data layer and the ViewModel support it, but the login screen only offers email and password.
+- **Thin use cases.** Most use cases only forward the call to the repository. They keep the rule uniform, but for trivial operations they add classes without adding logic.
+
 ### Other projects in this portfolio
 
 | Project | Platform | Language |
@@ -228,6 +236,14 @@ App Android de seguimiento de entrenamientos desarrollada como parte del portfol
 - **API compartida en .NET 10.** Las reglas de negocio viven en el servidor y la app solo habla con él usando el token de Firebase del usuario. Un solo backend sirve a todas las apps de este portfolio.
 - **Tests con fakes y MockK.** Casos de uso, repositorios, datasources remotos, todos los ViewModels, `safeCall`, el mapeo de errores, el interceptor de auth y el autenticador de 401 están cubiertos con fakes en memoria de las interfaces del dominio. MockK se usa cuando el colaborador es una clase concreta o el servicio Retrofit, y para simular las excepciones de Firebase, cuyos constructores no se ejecutan en tests de JVM. Los snackbars, diálogos y hojas no tienen tests de UI.
 - **El inicio de sesión con Google está preparado pero sin pantalla.** El datasource, el repositorio, el caso de uso y el ViewModel admiten entrar con un ID token de Google, pero la pantalla de login solo ofrece correo y contraseña, así que todavía no es visible para el usuario.
+
+### Limitaciones conocidas
+
+Deuda técnica asumida a propósito, documentada en lugar de ocultada:
+
+- **Sin tests de UI.** Los snackbars, diálogos y hojas se comprueban solo a mano; los tests automáticos llegan hasta los ViewModels.
+- **El inicio de sesión con Google no tiene pantalla.** La capa de datos y el ViewModel lo admiten, pero la pantalla de login solo ofrece correo y contraseña.
+- **Casos de uso finos.** La mayoría solo reenvían la llamada al repositorio. Mantienen la regla uniforme, pero en operaciones triviales añaden clases sin añadir lógica.
 
 ### Otros proyectos del portfolio
 
