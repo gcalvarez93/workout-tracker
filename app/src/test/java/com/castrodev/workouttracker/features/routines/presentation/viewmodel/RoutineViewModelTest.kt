@@ -14,6 +14,11 @@ import com.castrodev.workouttracker.features.routines.domain.usecase.GetRoutines
 import com.castrodev.workouttracker.features.routines.domain.usecase.UpdateRoutineUseCase
 import com.castrodev.workouttracker.util.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -88,6 +93,59 @@ class RoutineViewModelTest {
         first.complete(Result.success(listOf(testRoutine("vieja"))))
 
         assertEquals(RoutinesState.Success(newest), vm.routinesState.value)
+    }
+
+    @Test
+    fun `si la carga inicial falla y se reintenta con exito se muestra la lista`() {
+        repository.routinesResult = Result.failure(IOException("sin red"))
+        val vm = viewModel()
+        assertEquals(RoutinesState.Error(R.string.error_network), vm.routinesState.value)
+
+        val routines = listOf(testRoutine("r1"))
+        repository.routinesResult = Result.success(routines)
+        vm.loadRoutines()
+
+        assertEquals(RoutinesState.Success(routines), vm.routinesState.value)
+    }
+
+    @Test
+    fun `si recargar falla con rutinas en pantalla las conserva y avisa`() {
+        val routines = listOf(testRoutine("r1"))
+        repository.routinesResult = Result.success(routines)
+        val vm = viewModel()
+
+        repository.routinesResult = Result.failure(IOException("sin red"))
+        vm.loadRoutines()
+
+        assertEquals(RoutinesState.Success(routines), vm.routinesState.value)
+        assertEquals(R.string.error_network, vm.actionError.value)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `recargar con rutinas en pantalla no pasa por el estado de carga`() = runTest {
+        repository.routinesResult = Result.success(listOf(testRoutine("r1")))
+        val vm = viewModel()
+        val states = mutableListOf<RoutinesState>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            vm.routinesState.toList(states)
+        }
+
+        vm.loadRoutines()
+
+        assertTrue(states.none { it is RoutinesState.Loading })
+    }
+
+    @Test
+    fun `si recargar falla con la lista vacia muestra la pantalla de error`() {
+        repository.routinesResult = Result.success(emptyList())
+        val vm = viewModel()
+
+        repository.routinesResult = Result.failure(IOException("sin red"))
+        vm.loadRoutines()
+
+        assertEquals(RoutinesState.Error(R.string.error_network), vm.routinesState.value)
+        assertNull(vm.actionError.value)
     }
 
     // --- Detalle ---------------------------------------------------------------------------

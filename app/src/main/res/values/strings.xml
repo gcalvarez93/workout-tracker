@@ -26,6 +26,7 @@
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="retry">Retry</string>
     <string name="no_routines">No routines yet</string>
     <string name="delete_routine">Delete routine</string>
     <string name="delete_routine_confirm">Are you sure you want to delete this routine?</string>

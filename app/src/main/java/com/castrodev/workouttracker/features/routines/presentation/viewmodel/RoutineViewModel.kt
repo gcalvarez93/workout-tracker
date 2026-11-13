@@ -60,16 +60,31 @@ class RoutineViewModel @Inject constructor(
 
     init { loadRoutines() }
 
+    /**
+     * Carga la lista. Si ya hay rutinas en pantalla, la recarga se hace en segundo plano: no se
+     * sustituye la lista por el indicador de carga y, si falla, se avisa por [actionError] y se
+     * conserva lo que ya se veía. Solo cuando no hay datos se pasa por [RoutinesState.Loading] y
+     * [RoutinesState.Error] (pantalla de error con botón de reintento).
+     */
     fun loadRoutines() {
         // Si hay una carga en curso se descarta: gana siempre la última petición.
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
-            _routinesState.value = RoutinesState.Loading
+            if (!hasLoadedRoutines()) _routinesState.value = RoutinesState.Loading
             getRoutines()
                 .onSuccess { _routinesState.value = RoutinesState.Success(it) }
-                .onFailure { _routinesState.value = RoutinesState.Error(it.toMessageRes()) }
+                .onFailure {
+                    if (hasLoadedRoutines()) {
+                        _actionError.value = it.toMessageRes()
+                    } else {
+                        _routinesState.value = RoutinesState.Error(it.toMessageRes())
+                    }
+                }
         }
     }
+
+    private fun hasLoadedRoutines(): Boolean =
+        (_routinesState.value as? RoutinesState.Success)?.routines?.isNotEmpty() == true
 
     fun loadRoutineById(id: String) {
         viewModelScope.launch {

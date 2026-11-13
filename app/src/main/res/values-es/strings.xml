@@ -27,6 +27,7 @@
     <string name="save">Guardar</string>
     <string name="delete">Eliminar</string>
     <string name="cancel">Cancelar</string>
+    <string name="retry">Reintentar</string>
     <string name="no_routines">Aún no tienes rutinas</string>
     <string name="delete_routine">Eliminar rutina</string>
     <string name="delete_routine_confirm">¿Estás seguro de que quieres eliminar esta rutina?</string>

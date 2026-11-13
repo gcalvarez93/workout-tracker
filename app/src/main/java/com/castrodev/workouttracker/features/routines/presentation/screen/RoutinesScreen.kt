@@ -63,7 +63,14 @@ fun RoutinesScreen(
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (val s = state) {
                 is RoutinesState.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                is RoutinesState.Error   -> Text(stringResource(s.messageRes), modifier = Modifier.align(Alignment.Center))
+                is RoutinesState.Error   -> Column(
+                    modifier = Modifier.align(Alignment.Center).padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(stringResource(s.messageRes))
+                    Button(onClick = { viewModel.loadRoutines() }) { Text(stringResource(R.string.retry)) }
+                }
                 is RoutinesState.Success -> {
                     if (s.routines.isEmpty()) {
                         Text(stringResource(R.string.no_routines), modifier = Modifier.align(Alignment.Center))
