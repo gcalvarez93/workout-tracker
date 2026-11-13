@@ -119,6 +119,7 @@ Deliberate technical debt, documented rather than hidden:
 
 - **Only the routines list has retry and background reload.** The load error with a Retry button and the reload that keeps the list on screen apply to the routines list. The routine detail, sessions, analytics, body weight and profile screens still show a spinner on reload and only the error message when a load fails.
 - **No pull-to-refresh.** When a background reload fails and the list stays on screen, the error appears in a snackbar without a retry action; the list is refreshed again on the next action or screen visit.
+- **Gson does not enforce Kotlin null-safety.** Most response models have default values, so a missing field is filled in, but an explicit `null` in the JSON (or a missing field in a model without defaults) can put a `null` into a non-null property and fail later instead of at parse time. The risk is low because the backend is under the same control and does not send nulls for these fields; the alternative would be a Kotlin-aware converter such as `kotlinx.serialization` or Moshi.
 - **Release builds are not minified.** `isMinifyEnabled` is off, so R8 does not shrink or obfuscate the release build.
 - **No automated UI tests.** Snackbars, dialogs and sheets are checked by hand.
 - **Shared code is copied, not shared.** `AppError`, `safeCall`, the error mapping and the network layer also exist in recipe-manager; there is no shared module, so a fix has to be applied in both.
@@ -247,6 +248,7 @@ Deuda técnica asumida a propósito, documentada en lugar de ocultada:
 
 - **Solo la lista de rutinas tiene reintento y recarga en segundo plano.** El error de carga con botón de Reintentar y la recarga que mantiene la lista en pantalla se aplican a la lista de rutinas. El detalle de rutina, las sesiones, el análisis, el peso corporal y el perfil siguen mostrando un indicador de carga al recargar y solo el mensaje de error cuando falla una carga.
 - **Sin pull-to-refresh.** Cuando una recarga en segundo plano falla y la lista se queda en pantalla, el error sale en un snackbar sin acción de reintento; la lista se vuelve a actualizar en la siguiente acción o al volver a la pantalla.
+- **Gson no respeta la null-safety de Kotlin.** La mayoría de modelos de respuesta tienen valores por defecto, así que un campo ausente se rellena, pero un `null` explícito en el JSON (o un campo ausente en un modelo sin valores por defecto) puede meter un `null` en una propiedad no nula y fallar más tarde, en lugar de al parsear. El riesgo es bajo porque el backend es propio y no envía nulos en esos campos; la alternativa sería un conversor que entienda Kotlin, como `kotlinx.serialization` o Moshi.
 - **Las builds de release no están minificadas.** `isMinifyEnabled` está desactivado, así que R8 no reduce ni ofusca la build de release.
 - **Sin tests de UI automáticos.** Los snackbars, diálogos y hojas se comprueban a mano.
 - **Código compartido copiado, no compartido.** `AppError`, `safeCall`, el mapeo de errores y la capa de red existen también en recipe-manager; no hay un módulo común, así que una corrección hay que aplicarla en los dos.
